@@ -36,7 +36,9 @@ export default function SubscriptionForm() {
     //Data laoding ...
     setLoading("You have Subscribed Sucessfully..");
     //Data fetching here....
-    fetch("http://localhost:5000/sendemail", {
+    fetch("https://core-dev-server.vercel.app/sendemail", {
+
+    // vsercel api is here:https://core-dev-server.vercel.app/
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -54,24 +56,6 @@ export default function SubscriptionForm() {
         setLoading("");
         hitToast("Something went wrong. Please try again.", "error");
       });
-
-    // .then((data) => JSON.parse(`${data}`))
-    // .then(
-    //   (data) => {
-    //     // console.log(data)
-    //     if (data.acknowledged) {
-    //       toast.success("sucess");
-    //     } else {
-    //       toast.error("erorr");
-    //     }
-    //   }
-
-    // hitToast(data.message, data.success ? "success" : "error")
-    // );
-    // .catch((err) =>
-    // toast.error('Email invalid')
-    // hitToast("Something went wrong. Please try again.", "error")
-    // );
 
     setAlertClass("");
   };
