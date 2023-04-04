@@ -1,51 +1,79 @@
 import { useState, useRef } from "react";
+import { toast } from "react-toastify";
 import hitToast from "../helpers/hitToast";
 
 export default function SubscriptionForm() {
   let [email, setEmail] = useState("");
   let [alertClass, setAlertClass] = useState("");
+  const [loading, setLoading] = useState("");
+
   var parentComp = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    //Email Validated Here
+    const validate = (email) => {
+      if (
+        email
+          .trim()
+          .match(
+            /^([a-zA-Z0-9_\-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/
+          ) == null
+      ) {
+        return false;
+      } else if (email.trim() === "") {
+        return false;
+      }
+
+      return true;
+    };
 
     if (!validate(email)) {
       setAlertClass("alert-validate");
+      toast.error("eroor");
       return;
     }
+    //Data laoding ...
+    setLoading("You have Subscribed Sucessfully..");
+    //Data fetching here....
     fetch("http://localhost:5000/sendemail", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "content-type": "application/json",
       },
       body: JSON.stringify({ email }),
     })
-      .then((res) => res.text())
-      .then((data) => JSON.parse(`${data}`))
-      .then((data) =>
-        hitToast(data.message, data.success ? "success" : "error")
-      )
-      .catch(() =>
-        hitToast("Something went wrong. Please try again.", "error")
-      );
+      .then((res) => res.json())
+      // .then((data) => JSON.parse(`${data}`))
+      .then((data) => {
+        setLoading("");
+        console.log(data);
+        hitToast(data.acknowledged ? "sucess" : "erorr");
+      })
+      .catch(() => {
+        setLoading("");
+        hitToast("Something went wrong. Please try again.", "error");
+      });
+
+    // .then((data) => JSON.parse(`${data}`))
+    // .then(
+    //   (data) => {
+    //     // console.log(data)
+    //     if (data.acknowledged) {
+    //       toast.success("sucess");
+    //     } else {
+    //       toast.error("erorr");
+    //     }
+    //   }
+
+    // hitToast(data.message, data.success ? "success" : "error")
+    // );
+    // .catch((err) =>
+    // toast.error('Email invalid')
+    // hitToast("Something went wrong. Please try again.", "error")
+    // );
 
     setAlertClass("");
-  };
-
-  const validate = (email) => {
-    if (
-      email
-        .trim(
-          /^([a-zA-Z0-9_\-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/
-        )
-        .match() == null
-    ) {
-      return false;
-    } else if (email.trim() === "") {
-      return false;
-    }
-
-    return true;
   };
 
   return (
@@ -69,7 +97,7 @@ export default function SubscriptionForm() {
       </div>
 
       <button className="flex-c-m size3 s2-txt3 how-btn1 trans-04 where1">
-        Subscribe
+        {loading ? loading : "Subscribe"}
       </button>
     </form>
   );
